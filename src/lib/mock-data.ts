@@ -1,57 +1,56 @@
-export const matches = [
+import type { TraitVector } from "./i18n";
+import avatar1 from "@/assets/avatar-1.jpg";
+import avatar2 from "@/assets/avatar-2.jpg";
+import avatar3 from "@/assets/avatar-3.jpg";
+
+export interface Candidate {
+  id: string;
+  name: string;
+  age: number;
+  role: string;
+  location: string;
+  bio: string;
+  tags: string[];
+  avatar: string;
+  vector: TraitVector;
+}
+
+export const candidates: Candidate[] = [
   {
     id: "1",
-    name: "Aanya Sharma",
-    age: 23,
-    role: "Working Professional",
+    name: "Aanya Sharma", age: 23, role: "Working Professional",
     location: "Koramangala, Bangalore",
-    score: 94,
-    emotional: 96,
-    lifestyle: 91,
-    cleanliness: 95,
-    safety: 98,
-    social: 88,
     bio: "Quiet mornings, productive evenings. Loves matcha, books and slow Sundays.",
     tags: ["Early riser", "Tidy", "Non-smoker", "Yoga"],
-    why: "You both share a calm evening routine, a high cleanliness bar, and value emotional safety. Aanya's introvert-leaning energy beautifully complements your reflective nature.",
-    avatar: "AS",
-    gradient: "from-[oklch(0.85_0.12_320)] to-[oklch(0.85_0.1_350)]",
+    avatar: avatar1,
+    vector: { earlyRiser: 0.92, cleanliness: 0.95, focus: 0.88, introversion: 0.72, noiseTolerance: 0.25, safety: 0.96, emotional: 0.9 },
   },
   {
     id: "2",
-    name: "Riya Mehta",
-    age: 21,
-    role: "Student",
+    name: "Riya Mehta", age: 21, role: "Student",
     location: "HSR Layout, Bangalore",
-    score: 89,
-    emotional: 87,
-    lifestyle: 92,
-    cleanliness: 85,
-    safety: 94,
-    social: 90,
     bio: "Design student. Plants, playlists, and post-midnight study sprints.",
     tags: ["Night owl", "Creative", "Pet-friendly", "Vegetarian"],
-    why: "Aligned study rhythms and shared appreciation for creative downtime. Slight gap in cleanliness preference — manageable with a shared chore system.",
-    avatar: "RM",
-    gradient: "from-[oklch(0.85_0.1_10)] to-[oklch(0.85_0.12_30)]",
+    avatar: avatar2,
+    vector: { earlyRiser: 0.2, cleanliness: 0.7, focus: 0.6, introversion: 0.4, noiseTolerance: 0.7, safety: 0.85, emotional: 0.78 },
   },
   {
     id: "3",
-    name: "Saanvi Iyer",
-    age: 25,
-    role: "Working Professional",
+    name: "Saanvi Iyer", age: 25, role: "Working Professional",
     location: "Indiranagar, Bangalore",
-    score: 86,
-    emotional: 90,
-    lifestyle: 84,
-    cleanliness: 88,
-    safety: 96,
-    social: 80,
     bio: "Product manager who runs at dawn and journals at dusk.",
     tags: ["Athletic", "Mindful", "Cooks often", "Quiet"],
-    why: "Strong emotional and safety alignment. Saanvi's structured routine supports your focus blocks.",
-    avatar: "SI",
-    gradient: "from-[oklch(0.85_0.12_195)] to-[oklch(0.85_0.1_250)]",
+    avatar: avatar3,
+    vector: { earlyRiser: 0.95, cleanliness: 0.88, focus: 0.85, introversion: 0.6, noiseTolerance: 0.35, safety: 0.92, emotional: 0.82 },
+  },
+  {
+    id: "4",
+    name: "Meher Kaur", age: 22, role: "Intern",
+    location: "Whitefield, Bangalore",
+    bio: "Tech intern, plant mom, weekend hiker. Loves quiet kitchens.",
+    tags: ["Mindful", "Vegetarian", "Tidy", "Hiker"],
+    avatar: avatar1,
+    vector: { earlyRiser: 0.78, cleanliness: 0.9, focus: 0.75, introversion: 0.55, noiseTolerance: 0.4, safety: 0.94, emotional: 0.85 },
   },
 ];
 
@@ -97,16 +96,6 @@ export const testimonials = [
   { name: "Ananya D.", role: "MBA Student", quote: "94% compatibility — and it was real. Sleep schedules, energy, even how we handle conflict." },
 ];
 
-export const voiceQuestions = [
-  { id: 1, q: "Tell me about your ideal morning. When do you usually wake up and how do you like to start your day?", focus: "Sleep schedule" },
-  { id: 2, q: "How would your closest friend describe your cleanliness habits at home?", focus: "Cleanliness" },
-  { id: 3, q: "Walk me through a typical work or study day. How focused does your space need to be?", focus: "Routine" },
-  { id: 4, q: "After a long day, do you recharge with people around or with quiet alone time?", focus: "Social energy" },
-  { id: 5, q: "How do you feel about background music, calls, or guests in shared spaces?", focus: "Noise & guests" },
-  { id: 6, q: "What does feeling safe at home mean to you?", focus: "Safety" },
-  { id: 7, q: "When something feels off emotionally, how do you usually express it?", focus: "Emotional comfort" },
-];
-
 export const safeCircle = [
   { name: "Mom", relation: "Mother", phone: "+91 98765 43210", status: "Verified" },
   { name: "Kavya", relation: "Best friend", phone: "+91 99887 76655", status: "Verified" },
@@ -130,13 +119,4 @@ export const matchTrend = [
   { month: "May", matches: 640, safety: 2 },
   { month: "Jun", matches: 780, safety: 1 },
   { month: "Jul", matches: 910, safety: 4 },
-];
-
-export const compatibilityRadar = [
-  { trait: "Emotional", you: 92, them: 96 },
-  { trait: "Lifestyle", you: 88, them: 91 },
-  { trait: "Cleanliness", you: 94, them: 95 },
-  { trait: "Safety", you: 96, them: 98 },
-  { trait: "Social", you: 80, them: 88 },
-  { trait: "Routine", you: 90, them: 93 },
 ];
