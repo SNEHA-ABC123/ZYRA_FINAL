@@ -136,6 +136,10 @@ function AdminPage() {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <img src={m.avatar} alt={m.name} width={36} height={36} loading="lazy" className="size-9 rounded-xl object-cover" />
+                        <div>
+                          <div className="font-semibold">{m.name}</div>
+                          <div className="text-xs text-muted-foreground">{m.age} yrs</div>
+                        </div>
                       </div>
                     </td>
                     <td className="p-4">{m.role}</td>
