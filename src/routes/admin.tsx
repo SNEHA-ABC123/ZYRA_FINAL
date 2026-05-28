@@ -135,20 +135,17 @@ function AdminPage() {
                   <tr key={m.id} className="border-t border-border/60 hover:bg-white/40">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className={`size-9 rounded-xl bg-gradient-to-br ${m.gradient} grid place-items-center text-white font-bold text-xs`}>{m.avatar}</div>
-                        <div>
-                          <div className="font-semibold">{m.name}</div>
-                          <div className="text-xs text-muted-foreground">{m.age} yrs</div>
-                        </div>
+                        <img src={m.avatar} alt={m.name} width={36} height={36} loading="lazy" className="size-9 rounded-xl object-cover" />
                       </div>
                     </td>
                     <td className="p-4">{m.role}</td>
                     <td className="p-4 text-muted-foreground">{m.location}</td>
-                    <td className="p-4 font-semibold text-gradient">{m.score}%</td>
+                    <td className="p-4 font-semibold text-gradient">{Math.round(m.vector.emotional * 100)}%</td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-20 h-1.5 rounded-full bg-muted overflow-hidden"><div className="h-full bg-gradient-primary" style={{ width: `${m.safety}%` }} /></div>
-                        <span className="text-xs">{m.safety}</span>
+                        <div className="w-20 h-1.5 rounded-full bg-muted overflow-hidden"><div className="h-full bg-gradient-primary" style={{ width: `${Math.round(m.vector.safety * 100)}%` }} /></div>
+                        <span className="text-xs">{Math.round(m.vector.safety * 100)}</span>
+
                       </div>
                     </td>
                     <td className="p-4"><span className="text-[10px] inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/30 text-accent-foreground">Active</span></td>
