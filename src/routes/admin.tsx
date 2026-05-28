@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Users, Heart, Shield, Building2, TrendingUp, Search, Filter, AlertTriangle } from "lucide-react";
-import { adminStats, matchTrend, matches } from "@/lib/mock-data";
+import { adminStats, matchTrend, candidates } from "@/lib/mock-data";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend,
 } from "recharts";
@@ -20,7 +20,7 @@ const occupancyPie = [
 
 function AdminPage() {
   const [q, setQ] = useState("");
-  const filtered = matches.filter((m) => m.name.toLowerCase().includes(q.toLowerCase()) || m.location.toLowerCase().includes(q.toLowerCase()));
+  const filtered = candidates.filter((m: any) => m.name.toLowerCase().includes(q.toLowerCase()) || m.location.toLowerCase().includes(q.toLowerCase()));
 
   const kpis = [
     { l: "Total users", v: adminStats.users.toLocaleString(), i: Users, t: "+12.4%" },
@@ -131,7 +131,7 @@ function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((m) => (
+                {filtered.map((m: any) => (
                   <tr key={m.id} className="border-t border-border/60 hover:bg-white/40">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
