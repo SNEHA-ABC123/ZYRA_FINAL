@@ -9,8 +9,44 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VoiceIntakeRouteImport } from './routes/voice-intake'
+import { Route as SafeCircleRouteImport } from './routes/safe-circle'
+import { Route as RoomsRouteImport } from './routes/rooms'
+import { Route as MatchesRouteImport } from './routes/matches'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
+const VoiceIntakeRoute = VoiceIntakeRouteImport.update({
+  id: '/voice-intake',
+  path: '/voice-intake',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafeCircleRoute = SafeCircleRouteImport.update({
+  id: '/safe-circle',
+  path: '/safe-circle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoomsRoute = RoomsRouteImport.update({
+  id: '/rooms',
+  path: '/rooms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatchesRoute = MatchesRouteImport.update({
+  id: '/matches',
+  path: '/matches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +55,116 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
+  '/matches': typeof MatchesRoute
+  '/rooms': typeof RoomsRoute
+  '/safe-circle': typeof SafeCircleRoute
+  '/voice-intake': typeof VoiceIntakeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
+  '/matches': typeof MatchesRoute
+  '/rooms': typeof RoomsRoute
+  '/safe-circle': typeof SafeCircleRoute
+  '/voice-intake': typeof VoiceIntakeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
+  '/matches': typeof MatchesRoute
+  '/rooms': typeof RoomsRoute
+  '/safe-circle': typeof SafeCircleRoute
+  '/voice-intake': typeof VoiceIntakeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/matches'
+    | '/rooms'
+    | '/safe-circle'
+    | '/voice-intake'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/matches'
+    | '/rooms'
+    | '/safe-circle'
+    | '/voice-intake'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/matches'
+    | '/rooms'
+    | '/safe-circle'
+    | '/voice-intake'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  AuthRoute: typeof AuthRoute
+  MatchesRoute: typeof MatchesRoute
+  RoomsRoute: typeof RoomsRoute
+  SafeCircleRoute: typeof SafeCircleRoute
+  VoiceIntakeRoute: typeof VoiceIntakeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/voice-intake': {
+      id: '/voice-intake'
+      path: '/voice-intake'
+      fullPath: '/voice-intake'
+      preLoaderRoute: typeof VoiceIntakeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safe-circle': {
+      id: '/safe-circle'
+      path: '/safe-circle'
+      fullPath: '/safe-circle'
+      preLoaderRoute: typeof SafeCircleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rooms': {
+      id: '/rooms'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof RoomsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matches': {
+      id: '/matches'
+      path: '/matches'
+      fullPath: '/matches'
+      preLoaderRoute: typeof MatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +177,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  AuthRoute: AuthRoute,
+  MatchesRoute: MatchesRoute,
+  RoomsRoute: RoomsRoute,
+  SafeCircleRoute: SafeCircleRoute,
+  VoiceIntakeRoute: VoiceIntakeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
