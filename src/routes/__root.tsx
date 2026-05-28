@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { SurveyProvider } from "@/context/SurveyContext";
 
 function NotFoundComponent() {
   return (
@@ -71,13 +72,15 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-mesh">
-        <Nav />
-        <main className="pt-24">
-          <Outlet />
-        </main>
-        <Footer />
-      </div>
+      <SurveyProvider>
+        <div className="min-h-screen bg-mesh">
+          <Nav />
+          <main className="pt-24">
+            <Outlet />
+          </main>
+          <Footer />
+        </div>
+      </SurveyProvider>
     </QueryClientProvider>
   );
 }
