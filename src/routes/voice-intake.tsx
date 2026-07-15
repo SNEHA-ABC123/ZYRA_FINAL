@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Mic, Square, AlertCircle, CheckCircle2, ArrowRight, Volume2, VolumeX, Globe, Sparkles } from "lucide-react";
@@ -12,7 +12,8 @@ export const Route = createFileRoute("/voice-intake")({
 });
 
 function VoiceIntake() {
-  const { language, setLanguage, setAnswer, answers } = useSurvey();
+  const navigate = useNavigate();
+  const { language, setLanguage, setAnswer, answers , confidence} = useSurvey();
   const { speak, stopSpeaking, speaking, startListening, stopListening, listening, transcript, resetTranscript, supported } = useVoiceAgent();
 
   const [step, setStep] = useState(0);
@@ -53,12 +54,16 @@ function VoiceIntake() {
       // Fallback: simulate transcript so the demo works on browsers without STT
       const samples: Record<number, string> = {
         1: "I wake up around 6 in the morning and love a quiet start with chai.",
-        2: "My friends would say I'm very tidy and clean.",
+        2: "My friends would say I'm very tidy and organized.",
         3: "I need deep focus and quiet during work hours.",
         4: "I recharge with quiet alone time after a long day.",
         5: "I'm okay with low music but prefer headphones for calls.",
-        6: "Safety means verified entry and a trusted roommate.",
+        6: "Safety means verified entry and trusted roommates.",
         7: "I prefer to talk things out openly and kindly.",
+        8: "I care deeply about how other people feel.",
+        9: "I communicate directly and respectfully.",
+        10: "I value personal space and healthy boundaries.",
+        11: "I prefer resolving conflicts through discussion."
       };
       const full = samples[q.id] ?? "I value calm, clean and safe living.";
       let i = 0;
@@ -91,6 +96,15 @@ function VoiceIntake() {
   };
 
   const allDone = done && step === total - 1;
+  useEffect(() => {
+    if (allDone) {
+      const timer = setTimeout(() => {
+        navigate({ to: "/matches" });
+      }, 2500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [allDone, navigate]);
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
@@ -112,12 +126,34 @@ function VoiceIntake() {
               ))}
             </div>
           </div>
-          <div className="text-sm text-muted-foreground">
-            {t("question", language)} {Math.min(step + 1, total)} {t("of", language)} {total}
+          <div className="text-right">
+            <div className="text-sm text-muted-foreground">
+              {t("question", language)} {Math.min(step + 1, total)} {t("of", language)} {total}
+            </div>
+
+            <div className="text-xs text-primary mt-1">
+              ~ {Math.max(1, total - step)} min remaining
+            </div>
           </div>
         </div>
         <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
           <motion.div className="h-full bg-gradient-primary" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.5 }} />
+        </div>
+        <div className="mt-3 flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">
+            Personality Confidence
+          </span>
+
+          <span className="font-semibold text-primary">
+            {Math.round(confidence)}%
+          </span>
+        </div>
+
+        <div className="mt-1 h-2 rounded-full bg-muted overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-pink-500 to-violet-500"
+            style={{ width: `${confidence}%` }}
+          />
         </div>
       </div>
 
@@ -137,7 +173,7 @@ function VoiceIntake() {
               <motion.div
                 animate={{ scale: listening || speaking ? [1, 1.05, 1] : 1 }}
                 transition={{ duration: 1.2, repeat: Infinity }}
-                className="relative size-40 rounded-full bg-gradient-primary grid place-items-center shadow-glow"
+                className="relative size-40 rounded-full bg-gradient-primary grid place-items-center shadow-glow border border-white/30"
               >
                 {speaking ? <Volume2 className="size-16 text-primary-foreground" /> : <Mic className="size-16 text-primary-foreground" />}
               </motion.div>
@@ -174,9 +210,19 @@ function VoiceIntake() {
                 </button>
               )}
               {allDone && (
-                <Link to="/matches" className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-accent text-accent-foreground font-semibold">
-                  {t("results", language)} <ArrowRight className="size-4" />
-                </Link>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="text-primary font-medium animate-pulse">
+                    Analyzing your personality...
+                  </div>
+
+                  <Link
+                    to="/matches"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-accent text-accent-foreground font-semibold"
+                  >
+                    {t("results", language)}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </div>
               )}
             </div>
 
@@ -209,9 +255,64 @@ function VoiceIntake() {
           )}
 
           {done && !error && (
+            
             <div className="mt-4 flex items-start gap-3 p-4 rounded-2xl bg-accent/15 border border-accent/30">
               <CheckCircle2 className="size-5 shrink-0 mt-0.5 text-primary" />
-              <div className="text-sm">Captured. Trait dimension <span className="font-semibold">{q.dim}</span> updated in your personality vector.</div>
+              <div className="text-sm">
+                Response captured successfully.
+                <div className="mt-4 rounded-xl border bg-purple-50 p-4">
+                  <h3 className="text-sm font-semibold text-purple-700 mb-3">
+                    🧠 Emotional Signals Detected
+                    <div className="mt-4 rounded-xl border bg-green-50 p-4">
+                      <h3 className="text-sm font-semibold text-green-700 mb-2">
+                        🎤 Voice Clarity
+                      </h3>
+
+                      <div className="flex justify-between text-xs mb-1">
+                        <span>Clarity Score</span>
+                        <span>87%</span>
+                      </div>
+
+                      <div className="h-2 bg-white rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-green-500"
+                          style={{ width: "87%" }}
+                        />
+                      </div>
+                    </div>
+                  </h3>
+
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Empathy</span>
+                      <span>84%</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span>Communication</span>
+                      <span>91%</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span>Boundaries</span>
+                      <span>76%</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span>Conflict Style</span>
+                      <span>88%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-1 text-xs text-muted-foreground">
+                  Zyra updated your
+                  <span className="font-semibold ml-1">
+                    {q.dim}
+                  </span>
+                  personality trait.
+                </div>
+              </div>
             </div>
           )}
 

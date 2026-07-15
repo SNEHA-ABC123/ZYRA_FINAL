@@ -20,8 +20,18 @@
 import { TraitVector, TRAIT_KEYS, TRAIT_WEIGHTS, SurveyQuestion, surveyQuestions } from "./i18n";
 
 const DEFAULT_TRAIT: TraitVector = {
-  earlyRiser: 0.5, cleanliness: 0.5, focus: 0.5, introversion: 0.5,
-  noiseTolerance: 0.5, safety: 0.5, emotional: 0.5,
+  earlyRiser: 0.5,
+  cleanliness: 0.5,
+  focus: 0.5,
+  introversion: 0.5,
+  noiseTolerance: 0.5,
+  safety: 0.5,
+  emotional: 0.5,
+
+  empathy: 0.5,
+  communication: 0.5,
+  boundaries: 0.5,
+  conflictResolution: 0.5,
 };
 
 /** Score one trait from a free-text answer using keyword evidence. */
@@ -72,7 +82,12 @@ export function compatibility(a: TraitVector, b: TraitVector, confidence = 100):
   let dot = 0, na = 0, nb = 0;
 
   for (const k of TRAIT_KEYS) {
-    const ai = a[k], bi = b[k];
+    const ai = Number(a[k] ?? 0.5);
+    const bi = Number(b[k] ?? 0.5);
+
+    if (isNaN(ai) || isNaN(bi)) {
+      console.log("BAD TRAIT", k, ai, bi);
+    }
     const w = TRAIT_WEIGHTS[k];
     const sim = 1 - Math.abs(ai - bi);          // triangular kernel
     perTrait[k] = Math.round(sim * 100);
@@ -94,8 +109,20 @@ export function compatibility(a: TraitVector, b: TraitVector, confidence = 100):
   // Human reasons: top 2 traits, watchouts: bottom 2
   const ranked = TRAIT_KEYS.map((k) => ({ k, s: perTrait[k] }))
     .sort((x, y) => y.s - x.s);
-  const reasons = ranked.slice(0, 2).map((r) => REASON[r.k](r.s));
-  const watchouts = ranked.slice(-2).reverse().map((r) => WATCH[r.k](r.s));
+  const reasons = ranked
+    .slice(0, 2)
+    .map((r) =>
+      REASON[r.k]?.(r.s)
+        ?? `Strong alignment in ${r.k} (${r.s}%)`
+    );
+
+  const watchouts = ranked
+    .slice(-2)
+    .reverse()
+    .map((r) =>
+      WATCH[r.k]?.(r.s)
+        ?? `${r.k} may need discussion (${r.s}%)`
+    );
 
   return {
     score,
@@ -108,7 +135,7 @@ export function compatibility(a: TraitVector, b: TraitVector, confidence = 100):
   };
 }
 
-const REASON: Record<keyof TraitVector, (s: number) => string> = {
+const REASON: Partial<Record<keyof TraitVector, (s:number)=>string>> = {
   emotional:      (s) => `Aligned communication styles (${s}% match) — you'll both feel heard.`,
   safety:         (s) => `Shared safety-first values (${s}% match) build immediate trust.`,
   cleanliness:    (s) => `Compatible cleanliness standards (${s}%) — no friction over chores.`,
@@ -116,8 +143,20 @@ const REASON: Record<keyof TraitVector, (s: number) => string> = {
   earlyRiser:     (s) => `Sleep schedules align (${s}%) — quiet hours match naturally.`,
   introversion:   (s) => `Energy patterns align (${s}%) — you'll respect each other's space.`,
   noiseTolerance: (s) => `Noise comfort matches (${s}%) — shared rhythm at home.`,
+
+  empathy: (s) =>
+    `Strong emotional empathy (${s}%) — both understand each other's feelings.`,
+
+  communication: (s) =>
+    `Healthy communication compatibility (${s}%) — easier conflict prevention.`,
+
+  boundaries: (s) =>
+    `Personal boundaries align (${s}%) — mutual respect comes naturally.`,
+
+  conflictResolution: (s) =>
+    `Conflict resolution styles match (${s}%) — disagreements stay constructive.`,
 };
-const WATCH: Record<keyof TraitVector, (s: number) => string> = {
+const WATCH: Partial<Record<keyof TraitVector, (s:number)=>string>> = {
   emotional:      (s) => `Communication styles differ (${s}%) — set check-in rituals early.`,
   safety:         (s) => `Different safety expectations (${s}%) — agree on house rules upfront.`,
   cleanliness:    (s) => `Cleanliness gap (${s}%) — use a shared chore tracker.`,
@@ -125,6 +164,18 @@ const WATCH: Record<keyof TraitVector, (s: number) => string> = {
   earlyRiser:     (s) => `Sleep schedules differ (${s}%) — invest in good headphones.`,
   introversion:   (s) => `Social energy differs (${s}%) — talk openly about guest nights.`,
   noiseTolerance: (s) => `Noise tolerance varies (${s}%) — agree on call zones.`,
+
+  empathy: (s) =>
+    `Empathy levels differ (${s}%) — be intentional about emotional support.`,
+
+  communication: (s) =>
+    `Communication habits vary (${s}%) — establish expectations early.`,
+
+  boundaries: (s) =>
+    `Boundary preferences differ (${s}%) — discuss privacy and visitors upfront.`,
+
+  conflictResolution: (s) =>
+    `Different conflict styles (${s}%) — create a shared approach for disagreements.`,
 };
 
 function clamp(x: number, a: number, b: number) { return Math.max(a, Math.min(b, x)); }

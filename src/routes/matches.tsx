@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { getArchetype } from "@/lib/archetypes";
 import { motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { MapPin, Sparkles, Shield, Brain, Users, ArrowRight, Bookmark, MessageCircle, AlertCircle, Heart } from "lucide-react";
-import { candidates } from "@/lib/mock-data";
+
 import { compatibility } from "@/lib/matching";
 import { useSurvey } from "@/context/SurveyContext";
 import { TRAIT_KEYS } from "@/lib/i18n";
@@ -14,7 +15,33 @@ export const Route = createFileRoute("/matches")({
   head: () => ({ meta: [{ title: "Your Matches · Zyra AI" }, { name: "description", content: "AI compatibility results computed from your voice survey" }] }),
   component: MatchesPage,
 });
+interface Candidate {
+  id: string;
+  name: string;
+  age: number;
+  role: string;
+  location: string;
+  bio: string;
+  matchScore: number;
 
+  avatar: string;
+  tags: string[];
+
+  vector: {
+    earlyRiser: number;
+    cleanliness: number;
+    focus: number;
+    introversion: number;
+    noiseTolerance: number;
+    safety: number;
+    emotional: number;
+
+    empathy: number;
+    communication: number;
+    boundaries: number;
+    conflictResolution: number;
+  };
+}
 const traitLabel: Record<string, string> = {
   earlyRiser: "Sleep",
   cleanliness: "Tidy",
@@ -23,26 +50,60 @@ const traitLabel: Record<string, string> = {
   noiseTolerance: "Noise",
   safety: "Safety",
   emotional: "Emotion",
+
+  empathy: "Empathy",
+  communication: "Communication",
+  boundaries: "Boundaries",
+  conflictResolution: "Conflict",
 };
 
 function MatchesPage() {
   const { vector, confidence, answers } = useSurvey();
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [loading, setLoading] = useState(true);
   const hasSurvey = Object.keys(answers).length > 0;
 
+  useEffect(() => {
+  fetch("http://localhost:5000/api/candidates")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Candidates:", data);
+      setCandidates(data);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Fetch error:", err);
+      setLoading(false);
+    });
+}, []);
   // Compute compatibility for every candidate, sort descending
+  console.log("Candidates state:", candidates);
   const ranked = useMemo(() => {
     return candidates
       .map((c) => ({ candidate: c, result: compatibility(vector, c.vector, confidence) }))
       .sort((a, b) => b.result.score - a.result.score);
-  }, [vector, confidence]);
+  }, [candidates, vector, confidence]);
 
   const [selectedId, setSelectedId] = useState(ranked[0]?.candidate.id);
+  useEffect(() => {
+    if (ranked.length > 0 && !selectedId) {
+      setSelectedId(ranked[0].candidate.id);
+    }
+  }, [ranked, selectedId]);
   const [saved, setSaved] = useState<string[]>([]);
   const selected = ranked.find((r) => r.candidate.id === selectedId) ?? ranked[0];
-
+  if (!selected) {
+    return (
+      <div className="p-10">
+        No matches found.
+      </div>
+    );
+  }
+  const archetype = getArchetype(vector);
   const toggleSave = (id: string) =>
     setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
+  
   const radarData = TRAIT_KEYS.map((k) => ({
     trait: traitLabel[k],
     you: Math.round(vector[k] * 100),
@@ -59,9 +120,53 @@ function MatchesPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <span className="text-xs font-semibold uppercase tracking-widest text-primary">AI compatibility</span>
-          <h1 className="font-display text-4xl sm:text-5xl mt-2">Meet your <span className="text-gradient">top matches.</span></h1>
+          <h1 className="font-display text-4xl sm:text-5xl mt-2"> Meet your <span className="text-gradient">top matches.</span></h1>
+          <div className="mt-6 rounded-3xl border border-purple-200 bg-white/80 p-6 shadow-lg">
+                <div className="flex items-center gap-3">
+                   <span className="text-3xl">{archetype.emoji}</span>
+                   <div>
+                      <h3 className="text-xl font-bold text-purple-700">
+                        {archetype.title}
+                      </h3>
+
+                      <p className="text-sm text-gray-600">
+                        {archetype.description}
+                      </p>
+                   </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="rounded-xl bg-purple-50 p-3">
+                     <p className="text-xs text-gray-500">Safety</p>
+                     <p className="font-bold">
+                        {Math.round(vector.safety * 100)}%
+                      </p>
+                  </div>
+
+                  <div className="rounded-xl bg-pink-50 p-3">
+                     <p className="text-xs text-gray-500">Emotion</p>
+                     <p className="font-bold">
+                        {Math.round(vector.emotional * 100)}%
+                     </p>
+                  </div>
+
+                  <div className="rounded-xl bg-teal-50 p-3">
+                     <p className="text-xs text-gray-500">Empathy</p>
+                     <p className="font-bold">
+                        {Math.round(vector.empathy * 100)}%
+                     </p>
+                  </div>
+
+                  <div className="rounded-xl bg-blue-50 p-3">
+                     <p className="text-xs text-gray-500">Communication</p>
+                     <p className="font-bold">
+                        {Math.round(vector.communication * 100)}%
+                     </p>
+                  </div>
+                </div>
+          </div>
           <p className="mt-2 text-muted-foreground max-w-xl">
-            Scored with a weighted similarity + cosine model over your 7-dimensional personality vector. Confidence: <span className="font-semibold text-foreground">{Math.round(confidence)}%</span>
+            Scored with a weighted similarity + cosine model over your 11-dimensional personality vector. Confidence: <span className="font-semibold text-foreground">{Math.round(confidence)}%</span>
           </p>
         </div>
         <Link to="/rooms" className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-primary text-primary-foreground font-semibold shadow-soft">
@@ -124,12 +229,50 @@ function MatchesPage() {
                 <div className="text-xs text-muted-foreground">Match score</div>
                 <div className="font-display text-4xl text-gradient font-semibold">{selected.result.score}%</div>
                 <div className="text-[10px] text-muted-foreground mt-0.5">weighted {selected.result.weighted}% · cosine {selected.result.cosine}%</div>
+                <div className="mt-2">
+                  <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                    Confidence {selected.result.confidence}%
+                  </span>
+                </div>
               </div>
             </div>
             <p className="mt-4 text-foreground/90">{selected.candidate.bio}</p>
+            <div className="mt-5 rounded-2xl bg-purple-50 border border-purple-100 p-4">
+              <h3 className="font-semibold text-purple-700 mb-2">
+                ✨ Why Zyra Chose This Match
+              </h3>
+
+              <ul className="space-y-2 text-sm text-gray-700">
+                {selected.result.reasons.map((reason) => (
+                  <li key={reason}>• {reason}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="mt-4 rounded-2xl bg-amber-50 border border-amber-100 p-4">
+              <h3 className="font-semibold text-amber-700 mb-2">
+                ⚠ Potential Growth Areas
+              </h3>
+
+              <ul className="space-y-2 text-sm text-gray-700">
+                {selected.result.watchouts.map((watchout) => (
+                  <li key={watchout}>• {watchout}</li>
+                ))}
+              </ul>
+            </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-primary text-primary-foreground font-semibold shadow-soft hover:shadow-glow transition">
-                <MessageCircle className="size-4" /> Connect
+              <Link
+                to="/profile/$id"
+                params={{ id: String(selected.candidate.id) }}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-primary text-primary-foreground font-semibold shadow-soft"
+              >
+                <MessageCircle className="size-4" />
+                View Profile
+              </Link>
+              <button
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary text-white font-semibold"
+              >
+                <Heart className="size-4" />
+                Send Request
               </button>
               <button onClick={() => toggleSave(selected.candidate.id)} className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold border transition ${saved.includes(selected.candidate.id) ? "bg-primary/10 text-primary border-primary" : "bg-white border-border"}`}>
                 <Bookmark className={`size-4 ${saved.includes(selected.candidate.id) ? "fill-current" : ""}`} /> {saved.includes(selected.candidate.id) ? "Saved" : "Save match"}
@@ -169,28 +312,104 @@ function MatchesPage() {
             </div>
           </div>
 
-          <div className="glass-card p-6 bg-gradient-warm/40">
-            <div className="flex items-start gap-3">
-              <div className="size-10 rounded-2xl bg-gradient-primary grid place-items-center shrink-0"><Sparkles className="size-5 text-primary-foreground" /></div>
-              <div className="flex-1">
-                <div className="font-display text-xl font-semibold">Why this match?</div>
-                <div className="mt-3 space-y-2">
-                  {selected.result.reasons.map((r) => (
-                    <div key={r} className="flex items-start gap-2 text-sm"><Heart className="size-4 text-primary mt-0.5 shrink-0" /> {r}</div>
-                  ))}
+          <div className="rounded-3xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 p-6 text-white shadow-xl">
+              <h3 className="text-2xl font-bold mb-4">
+                💕 Zyra Chemistry Card
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-white/10 rounded-2xl p-4">
+                  <p className="text-sm opacity-80">
+                    Compatibility Score
+                  </p>
+
+                  <p className="text-4xl font-bold">
+                    {selected.result.score}%
+                  </p>
                 </div>
-                {selected.result.watchouts.length > 0 && (
-                  <div className="mt-4">
-                    <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Worth knowing</div>
-                    <div className="mt-2 space-y-2">
-                      {selected.result.watchouts.map((r) => (
-                        <div key={r} className="flex items-start gap-2 text-sm text-muted-foreground"><Shield className="size-4 text-accent-foreground mt-0.5 shrink-0" /> {r}</div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+
+                <div className="bg-white/10 rounded-2xl p-4">
+                  <p className="text-sm opacity-80">
+                    Emotional Sync
+                  </p>
+
+                  <p className="text-4xl font-bold">
+                    {selected.result.perTrait.emotional}%
+                  </p>
+                </div>
               </div>
-            </div>
+
+              <div className="mt-5">
+                <h4 className="font-semibold text-lg">
+                  Why Zyra Chose This Match
+                </h4>
+
+                <ul className="mt-3 space-y-2">
+                  {selected.result.reasons.map((r) => (
+                    <li key={r}>
+                      ✓ {r}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mt-5 border-t border-white/20 pt-4">
+                <h4 className="font-semibold text-lg">
+                  Potential Growth Areas
+                </h4>
+                <div className="mt-5 border-t border-white/20 pt-4">
+                  <h4 className="font-semibold text-lg">
+                    📖 Compatibility Journal
+                  </h4>
+
+                  <div className="mt-3 space-y-3 text-sm">
+
+                    <div>
+                      <span className="font-semibold">
+                        Shared Values:
+                      </span>
+                      {" "}
+                      Emotional safety, respect, and communication.
+                    </div>
+
+                    <div>
+                      <span className="font-semibold">
+                        Best Conversation Starter:
+                      </span>
+                      {" "}
+                      “What does your ideal Sunday look like?”
+                    </div>
+
+                    <div>
+                      <span className="font-semibold">
+                        Living Style Prediction:
+                      </span>
+                      {" "}
+                      Calm, supportive and low-conflict household.
+                    </div>
+
+                    <div>
+                      <span className="font-semibold">
+                        Roommate Success Forecast:
+                      </span>
+                      {" "}
+                      {Math.min(
+                        98,
+                        selected.result.score + 4
+                      )}%
+                    </div>
+
+                  </div>
+                </div>
+
+                <ul className="mt-3 space-y-2">
+                  {selected.result.watchouts.map((w) => (
+                    <li key={w}>
+                      ⚠ {w}
+                    </li>
+                  ))}
+                </ul>
+              </div>
           </div>
 
           <Link to="/rooms" className="block glass-card p-6 hover:-translate-y-0.5 transition-transform">

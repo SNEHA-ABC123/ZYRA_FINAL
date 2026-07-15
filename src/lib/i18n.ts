@@ -33,27 +33,55 @@ export interface SurveyQuestion {
 }
 
 export interface TraitVector {
-  earlyRiser: number;     // 0 = night owl, 1 = early bird
-  cleanliness: number;    // 0 = relaxed, 1 = very tidy
-  focus: number;          // 0 = needs background activity, 1 = needs deep quiet
-  introversion: number;   // 0 = extrovert, 1 = introvert
-  noiseTolerance: number; // 0 = needs silence, 1 = tolerates noise
-  safety: number;         // 0 = casual, 1 = safety-first
-  emotional: number;      // 0 = avoids talk, 1 = openly communicates
+  earlyRiser: number;
+  cleanliness: number;
+  focus: number;
+  introversion: number;
+  noiseTolerance: number;
+  safety: number;
+  emotional: number;
+  empathy: number;
+  communication: number;
+  boundaries: number;
+  conflictResolution: number;
 }
 
 export const TRAIT_KEYS: (keyof TraitVector)[] = [
-  "earlyRiser", "cleanliness", "focus", "introversion", "noiseTolerance", "safety", "emotional",
+  "earlyRiser",
+  "cleanliness",
+  "focus",
+  "introversion",
+  "noiseTolerance",
+  "safety",
+  "emotional",
+
+  "empathy",
+  "communication",
+  "boundaries",
+  "conflictResolution",
 ];
 
 // Importance weights — emotional + safety weighted highest (women-first product)
 export const TRAIT_WEIGHTS: Record<keyof TraitVector, number> = {
-  emotional:      1.5,
-  safety:         1.5,
-  cleanliness:    1.3,
-  focus:          1.1,
-  earlyRiser:     1.0,
-  introversion:   1.0,
+  emotional: 1.8,
+  empathy: 1.8,
+
+  communication: 1.6,
+
+  safety: 1.6,
+
+  boundaries: 1.5,
+
+  conflictResolution: 1.5,
+
+  cleanliness: 1.3,
+
+  focus: 1.1,
+
+  earlyRiser: 1.0,
+
+  introversion: 1.0,
+
   noiseTolerance: 0.9,
 };
 
@@ -142,6 +170,111 @@ export const surveyQuestions: SurveyQuestion[] = [
       pa: "ਜਦੋਂ ਭਾਵਨਾਤਮਕ ਤੌਰ 'ਤੇ ਕੁਝ ਸਹੀ ਨਹੀਂ ਲੱਗਦਾ, ਤੁਸੀਂ ਆਮ ਤੌਰ 'ਤੇ ਇਸਨੂੰ ਕਿਵੇਂ ਪ੍ਰਗਟ ਕਰਦੇ ਹੋ?",
     },
   },
+  {
+    id: 8,
+    focus: "Empathy",
+    dim: "empathy",
+
+    low: [
+      "ignore",
+      "leave",
+      "busy",
+      "their problem"
+    ],
+
+    high: [
+      "listen",
+      "support",
+      "help",
+      "understand",
+      "comfort"
+    ],
+
+    text: {
+      en: "If your roommate is having a difficult day, what would you most likely do?",
+      hi: "यदि आपकी रूममेट का दिन कठिन रहा हो, तो आप सबसे पहले क्या करेंगी?",
+      bn: "আপনার রুমমেটের দিন খারাপ গেলে আপনি কী করবেন?",
+      mr: "तुमच्या रूममेटचा दिवस कठीण गेला असेल तर तुम्ही काय कराल?",
+      pa: "ਜੇ ਤੁਹਾਡੀ ਰੂਮਮੇਟ ਦਾ ਦਿਨ ਮੁਸ਼ਕਲ ਰਿਹਾ ਹੋਵੇ ਤਾਂ ਤੁਸੀਂ ਕੀ ਕਰੋਗੇ?"
+    }
+  },
+  {
+    id: 9,
+    focus: "Communication",
+    dim: "communication",
+
+    low: [
+      "avoid",
+      "silent",
+      "ignore"
+    ],
+
+    high: [
+      "discuss",
+      "talk",
+      "communicate",
+      "resolve"
+    ],
+
+    text: {
+      en: "How do you usually handle disagreements with people close to you?",
+      hi: "करीबी लोगों से मतभेद होने पर आप उन्हें कैसे संभालती हैं?",
+      bn: "ঘনিষ্ঠ মানুষের সাথে মতবিরোধ হলে আপনি কীভাবে সামলান?",
+      mr: "जवळच्या लोकांशी मतभेद झाल्यास तुम्ही ते कसे हाताळता?",
+      pa: "ਨਜ਼ਦੀਕੀ ਲੋਕਾਂ ਨਾਲ ਅਸਹਿਮਤੀ ਹੋਵੇ ਤਾਂ ਤੁਸੀਂ ਕਿਵੇਂ ਸੰਭਾਲਦੇ ਹੋ?"
+    }
+  },
+  {
+    id: 10,
+    focus: "Boundaries",
+    dim: "boundaries",
+
+    low: [
+      "anything",
+      "doesnt matter"
+    ],
+
+    high: [
+      "privacy",
+      "respect",
+      "personal space",
+      "boundaries"
+    ],
+
+    text: {
+      en: "What makes you feel most comfortable in a shared living space?",
+      hi: "साझा रहने की जगह में आपको सबसे अधिक सहज क्या महसूस कराता है?",
+      bn: "একটি শেয়ারড স্পেসে কী আপনাকে সবচেয়ে স্বস্তি দেয়?",
+      mr: "सामायिक जागेत तुम्हाला सर्वात जास्त आरामदायी काय वाटते?",
+      pa: "ਸਾਂਝੇ ਰਹਿਣ ਵਾਲੀ ਥਾਂ ਵਿੱਚ ਤੁਹਾਨੂੰ ਸਭ ਤੋਂ ਵੱਧ ਆਰਾਮਦਾਇਕ ਕੀ ਮਹਿਸੂਸ ਕਰਦਾ ਹੈ?"
+    }
+  },
+  {
+    id: 11,
+    focus: "Conflict Resolution",
+    dim: "conflictResolution",
+
+    low: [
+      "fight",
+      "angry",
+      "shout"
+    ],
+
+    high: [
+      "solve",
+      "understand",
+      "compromise",
+      "discussion"
+    ],
+
+    text: {
+      en: "When a conflict happens, how do you usually approach it?",
+      hi: "जब कोई विवाद होता है, तो आप उसे कैसे संभालती हैं?",
+      bn: "সংঘাত হলে আপনি সাধারণত কীভাবে সামলান?",
+      mr: "संघर्ष झाल्यास तुम्ही तो कसा हाताळता?",
+      pa: "ਜਦੋਂ ਕੋਈ ਟਕਰਾਅ ਹੁੰਦਾ ਹੈ ਤਾਂ ਤੁਸੀਂ ਇਸਨੂੰ ਕਿਵੇਂ ਹੱਲ ਕਰਦੇ ਹੋ?"
+    }
+  }
 ];
 
 export const ui: Record<string, Record<LanguageCode, string>> = {

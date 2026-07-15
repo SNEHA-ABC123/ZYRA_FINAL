@@ -12,6 +12,9 @@ export interface Candidate {
   bio: string;
   tags: string[];
   avatar: string;
+
+  matchScore: number;
+
   vector: TraitVector;
 }
 
@@ -23,7 +26,21 @@ export const candidates: Candidate[] = [
     bio: "Quiet mornings, productive evenings. Loves matcha, books and slow Sundays.",
     tags: ["Early riser", "Tidy", "Non-smoker", "Yoga"],
     avatar: avatar1,
-    vector: { earlyRiser: 0.92, cleanliness: 0.95, focus: 0.88, introversion: 0.72, noiseTolerance: 0.25, safety: 0.96, emotional: 0.9 },
+    matchScore: 79,
+    vector: {
+      earlyRiser: 0.9,
+      cleanliness: 0.95,
+      focus: 0.8,
+      introversion: 0.7,
+      noiseTolerance: 0.3,
+      safety: 0.95,
+      emotional: 0.82,
+
+      empathy: 0.88,
+      communication: 0.75,
+      boundaries: 0.90,
+      conflictResolution: 0.84,
+    },
   },
   {
     id: "2",
@@ -32,7 +49,21 @@ export const candidates: Candidate[] = [
     bio: "Design student. Plants, playlists, and post-midnight study sprints.",
     tags: ["Night owl", "Creative", "Pet-friendly", "Vegetarian"],
     avatar: avatar2,
-    vector: { earlyRiser: 0.2, cleanliness: 0.7, focus: 0.6, introversion: 0.4, noiseTolerance: 0.7, safety: 0.85, emotional: 0.78 },
+    matchScore: 89,
+    vector: {
+      earlyRiser: 0.3,
+      cleanliness: 0.65,
+      focus: 0.55,
+      introversion: 0.45,
+      noiseTolerance: 0.75,
+      safety: 0.85,
+      emotional: 0.90,
+
+      empathy: 0.92,
+      communication: 0.95,
+      boundaries: 0.70,
+      conflictResolution: 0.88,
+    },
   },
   {
     id: "3",
@@ -41,7 +72,21 @@ export const candidates: Candidate[] = [
     bio: "Product manager who runs at dawn and journals at dusk.",
     tags: ["Athletic", "Mindful", "Cooks often", "Quiet"],
     avatar: avatar3,
-    vector: { earlyRiser: 0.95, cleanliness: 0.88, focus: 0.85, introversion: 0.6, noiseTolerance: 0.35, safety: 0.92, emotional: 0.82 },
+    matchScore: 83,
+    vector: {
+      earlyRiser: 0.85,
+      cleanliness: 0.80,
+      focus: 0.90,
+      introversion: 0.60,
+      noiseTolerance: 0.40,
+      safety: 0.90,
+      emotional: 0.70,
+
+      empathy: 0.75,
+      communication: 0.78,
+      boundaries: 0.88,
+      conflictResolution: 0.92,
+    },
   },
   {
     id: "4",
@@ -50,7 +95,21 @@ export const candidates: Candidate[] = [
     bio: "Tech intern, plant mom, weekend hiker. Loves quiet kitchens.",
     tags: ["Mindful", "Vegetarian", "Tidy", "Hiker"],
     avatar: avatar1,
-    vector: { earlyRiser: 0.78, cleanliness: 0.9, focus: 0.75, introversion: 0.55, noiseTolerance: 0.4, safety: 0.94, emotional: 0.85 },
+    matchScore: 76,
+    vector: {
+      earlyRiser: 0.75,
+      cleanliness: 0.92,
+      focus: 0.72,
+      introversion: 0.82,
+      noiseTolerance: 0.35,
+      safety: 0.96,
+      emotional: 0.76,
+
+      empathy: 0.84,
+      communication: 0.72,
+      boundaries: 0.95,
+      conflictResolution: 0.80,
+    },
   },
 ];
 
